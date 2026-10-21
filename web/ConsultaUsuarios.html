@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Usuario</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+    <div class="container">
+
+    <div class="icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <h1 class="title">Consultar Usuario</h1>
+    <p class="subtitle">Ingresa el usuario a consultar</p>
+
+        <form action="controlUsuarios" method="post">
+
+            <input 
+                type="text" 
+                name="usuario" 
+                class="input" 
+                placeholder="Usuario" 
+                required
+            >
+
+            <input 
+                type="hidden" 
+                name="opcion" 
+                value="BuscaUsuario"
+            >
+
+            <input 
+                type="submit" 
+                name="ConsultaIndividualA" 
+                value="Buscar" 
+                class="btn btn-primary"
+            >
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

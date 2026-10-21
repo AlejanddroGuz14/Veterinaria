@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignar Horario Laboral</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .semana-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .dia-col {
+            border: 2px solid #90e0ef;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .dia-header {
+            background: #0077b6;
+            color: white;
+            text-align: center;
+            padding: 8px 4px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+        }
+        .dia-header:hover  { background: #023e8a; }
+        .dia-header.activo { background: #00b4d8; }
+        .dia-horas {
+            display: none;
+            flex-direction: column;
+        }
+        .dia-horas.visible { display: flex; }
+        .hora-bloque {
+            padding: 4px 6px;
+            font-size: 11px;
+            text-align: center;
+            border-top: 1px solid #e0f7fa;
+            background: #f0f9ff;
+            color: #023e8a;
+        }
+        .hora-bloque.trabajando {
+            background: #00b4d8;
+            color: white;
+            font-weight: bold;
+        }
+        .dia-col.seleccionado .dia-header { background: #023e8a; }
+        .leyenda {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 12px;
+            align-items: center;
+        }
+        .leyenda-item { display: flex; align-items: center; gap: 5px; }
+        .leyenda-color { width: 16px; height: 16px; border-radius: 4px; }
+        #diasSeleccionados {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #023e8a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container-large">
+
+    <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
+    <h2 class="title">Asignar Horario Laboral</h2>
+    <p class="subtitle">Selecciona el empleado y los días de la semana a laborar</p>
+
+    <form action="controlEmpleados" method="post" id="formHorario">
+
+        <label class="label">Usuario del empleado:</label>
+        <select name="usuarioEmpleado" class="select" required>
+            <option value="">-- Selecciona un empleado --</option>
+        </select>
+
+        <label class="label">Turno asignado:</label>
+        <select name="idTurnoRef" id="selTurno" class="select" required onchange="mostrarCalendario(this)">
+            <option value="">-- Selecciona turno para ver horario --</option>
+        </select>
+
+        <!-- CALENDARIO SEMANAL -->
+        <div id="calendarioSemanal" style="display:none; margin-top:20px;">
+
+            <hr style="border-color:#90e0ef; margin:20px 0;">
+            <h3 class="title" style="font-size:18px;"><i class="fa-solid fa-calendar-days"></i> Días a Laborar</h3>
+            <p class="subtitle">Haz clic en el nombre del día para seleccionarlo/deseleccionarlo</p>
+
+            <div class="semana-grid" id="semanaGrid"></div>
+
+            <div class="leyenda">
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background:#00b4d8;"></div>
+                    <span>Horas de trabajo</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background:#f0f9ff; border:1px solid #90e0ef;"></div>
+                    <span>Fuera de turno</span>
+                </div>
+            </div>
+
+            <div id="diasSeleccionados">Días seleccionados: ninguno</div>
+
+            <input type="hidden" name="diasLaborales"    id="diasLaborales">
+            <input type="hidden" name="horaEntradaTurno" id="horaEntradaTurno">
+            <input type="hidden" name="horaSalidaTurno"  id="horaSalidaTurno">
+
+        </div>
+
+        <br>
+        <input type="submit" name="AsignarHorarioA" value="Asignar Horario" class="btn btn-primary">
+
+    </form>
+
+</div>
+
+<script>
+    const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    let diasActivos = new Set();
+
+    window.onload = function () {
+        cargarTurnos();
+        cargarEmpleados();
+    };
+
+    function cargarEmpleados() {
+        fetch("controlEmpleados?accion=CargarEmpleadosYAdmins")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var sel = document.querySelector("select[name='usuarioEmpleado']");
+                data.forEach(function(e) {
+                    var opt = document.createElement("option");
+                    opt.value = e[0];
+                    var tipo = e[2] === "A" ? "Admin" : "Empleado";
+                    opt.text  = e[1] + " (" + tipo + ") — " + e[0];
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    function cargarTurnos() {
+        fetch("controlEmpleados?accion=CargarTurnos")
+            .then(r => r.json())
+            .then(data => {
+                const sel = document.getElementById("selTurno");
+                data.forEach(t => {
+                    const opt = document.createElement("option");
+                    opt.value           = t[0];
+                    opt.text            = t[1];
+                    opt.dataset.entrada = t[2];
+                    opt.dataset.salida  = t[3];
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    function mostrarCalendario(sel) {
+        const opt = sel.options[sel.selectedIndex];
+        if (!opt || !opt.dataset.entrada) {
+            document.getElementById('calendarioSemanal').style.display = 'none';
+            return;
+        }
+        const entrada = opt.dataset.entrada.substring(0, 5);
+        const salida  = opt.dataset.salida.substring(0, 5);
+
+        document.getElementById('horaEntradaTurno').value = entrada;
+        document.getElementById('horaSalidaTurno').value  = salida;
+
+        diasActivos.clear();
+        construirGrid(entrada, salida);
+        document.getElementById('calendarioSemanal').style.display = 'block';
+        actualizarResumen();
+    }
+
+    function construirGrid(entrada, salida) {
+        const grid = document.getElementById('semanaGrid');
+        grid.innerHTML = '';
+        const hEntrada = parseInt(entrada.split(':')[0]);
+        const hSalida  = parseInt(salida.split(':')[0]);
+        const hInicio  = 6;
+        const hFin     = 22;
+
+        DIAS.forEach((dia, idx) => {
+            const numDia = idx + 1;
+            const col = document.createElement('div');
+            col.className = 'dia-col';
+            col.id = 'dia-' + numDia;
+
+            const header = document.createElement('div');
+            header.className = 'dia-header';
+            header.textContent = dia;
+            header.onclick = () => toggleDia(numDia);
+
+            const horas = document.createElement('div');
+            horas.className = 'dia-horas';
+            horas.id = 'horas-' + numDia;
+
+            for (let h = hInicio; h < hFin; h++) {
+                const bloque = document.createElement('div');
+                bloque.className = 'hora-bloque';
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                const h12  = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+                bloque.textContent = h12 + ':00 ' + ampm;
+                if (h >= hEntrada && h < hSalida) bloque.classList.add('trabajando');
+                horas.appendChild(bloque);
+            }
+
+            col.appendChild(header);
+            col.appendChild(horas);
+            grid.appendChild(col);
+        });
+    }
+
+    function toggleDia(numDia) {
+        const col    = document.getElementById('dia-' + numDia);
+        const horas  = document.getElementById('horas-' + numDia);
+        const header = col.querySelector('.dia-header');
+
+        if (diasActivos.has(numDia)) {
+            diasActivos.delete(numDia);
+            col.classList.remove('seleccionado');
+            header.classList.remove('activo');
+            horas.classList.remove('visible');
+        } else {
+            diasActivos.add(numDia);
+            col.classList.add('seleccionado');
+            header.classList.add('activo');
+            horas.classList.add('visible');
+        }
+        actualizarResumen();
+    }
+
+    function actualizarResumen() {
+        const nombres = [...diasActivos].sort().map(d => DIAS[d - 1]);
+        const resumen = document.getElementById('diasSeleccionados');
+        resumen.textContent = diasActivos.size === 0
+            ? 'Días seleccionados: ninguno'
+            : 'Días seleccionados: ' + nombres.join(', ');
+        document.getElementById('diasLaborales').value = [...diasActivos].sort().join(',');
+    }
+
+    document.getElementById('formHorario').addEventListener('submit', function(e) {
+        const dias  = document.getElementById('diasLaborales').value;
+        const turno = document.getElementById('selTurno').value;
+        if (turno && (!dias || dias.trim() === '')) {
+            e.preventDefault();
+            alert('Debes seleccionar al menos un día de trabajo en el calendario.');
+        }
+    });
+</script>
+
+</body>
+</html>

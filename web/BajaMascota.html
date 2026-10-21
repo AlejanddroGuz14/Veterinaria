@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Baja de Mascota</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-paw"></i></div>
+    <h1 class="title">Baja de Mascota</h1>
+    <p class="subtitle">Ingresa el usuario del cliente para ver sus mascotas</p>
+
+    <form action="controlMascotas" method="post" id="formBaja" onsubmit="return confirmar();">
+
+        <label class="label">Usuario del cliente:</label>
+        <input type="text" name="usuarioCliente" id="usuarioCliente"
+               class="input" placeholder="Ej. JuaPerLop045" required>
+
+        <!-- SELECTOR DE MASCOTA -->
+        <div id="seccionMascota" style="display:none;">
+            <label class="label">Mascota:</label>
+            <select name="idMascota" id="selMascota" class="select" required>
+                <option value="">-- Selecciona una mascota --</option>
+            </select>
+
+            <label class="label">Motivo de baja:</label>
+            <select name="idMotivo" id="selMotivo" class="select" required>
+                <option value="">-- Selecciona motivo --</option>
+            </select>
+        </div>
+
+        <div id="msgNada" style="display:none; color:#555; text-align:center; margin-top:15px;">
+            El cliente no tiene mascotas activas.
+        </div>
+
+        <input type="submit" name="BajaMascotaA" value="Dar de baja" class="btn btn-primary"
+               onclick="return validarYCargar()">
+
+    </form>
+
+    <!-- BOTÓN VOLVER -->
+    <a href="javascript:history.back()" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
+
+</div>
+
+<script>
+    window.onload = function() {
+        // Cargar motivos de baja
+        fetch("controlMascotas?accion=CargarMotivos")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var sel = document.getElementById("selMotivo");
+                data.forEach(function(m) {
+                    var opt = document.createElement("option");
+                    opt.value = m[0];
+                    opt.text  = m[1];
+                    sel.appendChild(opt);
+                });
+            });
+    };
+
+    function cargarMascotas() {
+        var usr = document.getElementById("usuarioCliente").value.trim();
+        if (!usr) return;
+
+        fetch("controlMascotas?accion=CargarMascotasPorCliente&usr=" + encodeURIComponent(usr))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var seccion = document.getElementById("seccionMascota");
+                var msgNada = document.getElementById("msgNada");
+                var sel     = document.getElementById("selMascota");
+
+                sel.innerHTML = "<option value=''>-- Selecciona una mascota --</option>";
+
+                if (!data || data.length === 0) {
+                    seccion.style.display = "none";
+                    msgNada.style.display = "block";
+                    return;
+                }
+
+                msgNada.style.display = "none";
+                data.forEach(function(m) {
+                    var opt = document.createElement("option");
+                    opt.value = m[0];
+                    opt.text  = m[1] + " (" + m[2] + ")";
+                    sel.appendChild(opt);
+                });
+                seccion.style.display = "block";
+                mascotasCargadas = true;
+            });
+    }
+
+    function confirmar() {
+        return confirm("¿Seguro que deseas dar de baja esta mascota?");
+    }
+
+    var mascotasCargadas = false;
+
+    function validarYCargar() {
+        var usr = document.getElementById("usuarioCliente").value.trim();
+        if (!usr) { alert("Ingresa el usuario del cliente."); return false; }
+        if (!mascotasCargadas) { cargarMascotas(); return false; }
+        if (!document.getElementById("selMascota").value) { alert("Selecciona una mascota."); return false; }
+        if (!document.getElementById("selMotivo").value) { alert("Selecciona un motivo."); return false; }
+        return confirmar();
+    }
+</script>
+
+</body>
+</html>

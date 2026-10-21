@@ -1,0 +1,39 @@
+# ==========================================
+#  .gitignore para proyecto Java Web (NetBeans + Ant)
+# ==========================================
+
+# Carpetas generadas al compilar (NetBeans/Ant)
+/build/
+/dist/
+/nbproject/private/
+build/
+dist/
+
+# Archivos de configuración local de NetBeans
+nbproject/private/
+nbproject/*.properties.local
+
+# Clases compiladas
+*.class
+
+# Archivos de log
+*.log
+
+# Archivos empaquetados generados
+*.war
+*.ear
+# (los .jar de /lib son dependencias y SÍ se suben; no los ignoramos)
+
+# Carpetas y archivos de Visual Studio (aparecieron en lib/)
+.vs/
+*.ssmssln
+
+# Archivos del sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Archivos temporales de editores
+*~
+*.swp
+*.bak

@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Horario General de Atención</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs { display:flex; gap:0; margin-top:20px; flex-wrap:wrap; }
+        .tab-btn {
+            padding:10px 20px;
+            background:#0077b6;
+            color:white;
+            border:none;
+            cursor:pointer;
+            font-weight:bold;
+            font-size:13px;
+            border-right:1px solid #023e8a;
+            transition:0.2s;
+        }
+        .tab-btn:first-child { border-radius:10px 0 0 0; }
+        .tab-btn:last-child { border-radius:0 10px 0 0; border-right:none; }
+        .tab-btn.activo { background:#023e8a; }
+        .tab-btn:hover { background:#023e8a; }
+        .tab-content {
+            border:2px solid #90e0ef;
+            border-top:none;
+            border-radius:0 0 12px 12px;
+            padding:20px;
+            background:#f0f9ff;
+            display:none;
+        }
+        .tab-content.activo { display:block; }
+        .tab-content h3 { color:#023e8a; margin:0 0 5px 0; }
+        .tab-content p { color:#0077b6; margin:0 0 10px 0; font-size:13px; }
+        .horario-tabla { width:100%; border-collapse:collapse; margin-top:10px; }
+        .horario-tabla th { background:#023e8a; color:white; padding:10px; font-size:13px; }
+        .horario-tabla td { padding:8px; text-align:center; border-bottom:1px solid #e0f7fa; font-size:12px; }
+        .horario-tabla tr:nth-child(even) { background:#e0f7fa; }
+        .turno-mat { color:#0077b6; font-weight:bold; }
+        .turno-ves { color:#e76f51; font-weight:bold; }
+        .descarga-section { margin-top:15px; display:flex; align-items:center; gap:10px; }
+        .descarga-section select { padding:6px 10px; border-radius:6px; border:1px solid #90e0ef; font-size:13px; }
+        .btn-descargar { display:none; padding:8px 16px; background:#023e8a; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; }
+        .btn-descargar:hover { background:#0077b6; }
+    </style>
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container-large">
+
+    <div class="icon"><i class="fa-solid fa-clock"></i></div>
+    <h2 class="title">Horario General de Atención</h2>
+    <p class="subtitle">Horarios semanales de todos los veterinarios</p>
+
+    <div id="contenido"></div>
+
+</div>
+
+<script>
+    var DIAS = ['','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    var vetsGlobal = [];
+
+    window.onload = function() {
+        fetch("controlCitas?accion=CargarVeterinarios")
+            .then(function(r) { return r.json(); })
+            .then(function(vets) {
+                if (!vets || vets.length === 0) {
+                    document.getElementById("contenido").innerHTML = "<p style='text-align:center; color:#555;'>No hay veterinarios registrados.</p>";
+                    return;
+                }
+                vetsGlobal = vets;
+                var promesas = vets.map(function(v) {
+                    return fetch("controlCitas?accion=CargarHorarioVeterinario&idAcceso=" + v[0])
+                        .then(function(r) { return r.json(); })
+                        .then(function(horario) {
+                            return { vet: v, horario: horario };
+                        });
+                });
+                Promise.all(promesas).then(function(resultados) {
+                    construirPestanas(resultados);
+                });
+            });
+    };
+
+    function construirPestanas(resultados) {
+        var contenido = document.getElementById("contenido");
+        var tabsHTML = "<div class='tabs'>";
+        var panelsHTML = "";
+
+        resultados.forEach(function(r, idx) {
+            var vet = r.vet;
+            var horario = r.horario;
+            var activo = idx === 0 ? " activo" : "";
+
+            tabsHTML += "<button class='tab-btn" + activo + "' onclick='cambiarTab(" + idx + ")'>" + vet[1] + "</button>";
+
+            panelsHTML += "<div class='tab-content" + activo + "' id='panel-" + idx + "'>";
+            panelsHTML += "<h3>" + vet[1] + "</h3>";
+            panelsHTML += "<p>" + vet[2] + " — " + vet[3] + "</p>";
+
+            if (!horario || horario.length === 0) {
+                panelsHTML += "<p style='color:#555;'>Sin horario asignado</p>";
+            } else {
+                panelsHTML += "<table class='horario-tabla'>";
+                panelsHTML += "<tr><th>Día</th><th>Entrada</th><th>Salida</th><th>Turno</th></tr>";
+
+                horario.forEach(function(h) {
+                    var entrada = h[2].substring(0,5);
+                    var salida  = h[3].substring(0,5);
+                    var hE = parseInt(h[2].substring(0,2));
+                    var turno = hE < 14 ? "Matutino" : "Vespertino";
+                    var turnoClass = hE < 14 ? "turno-mat" : "turno-ves";
+
+                    panelsHTML += "<tr>";
+                    panelsHTML += "<td><strong>" + h[1] + "</strong></td>";
+                    panelsHTML += "<td>" + entrada + "</td>";
+                    panelsHTML += "<td>" + salida + "</td>";
+                    panelsHTML += "<td class='" + turnoClass + "'>" + turno + "</td>";
+                    panelsHTML += "</tr>";
+                });
+
+                panelsHTML += "</table>";
+            }
+
+            // Sección de descarga
+            panelsHTML += "<div class='descarga-section'>";
+            panelsHTML += "<select id='selDescarga-" + idx + "' onchange='toggleBtnDescarga(" + idx + ")'>";
+            panelsHTML += "<option value=''>-- Acción --</option>";
+            panelsHTML += "<option value='pdf'>Descargar Horario Semanal PDF</option>";
+            panelsHTML += "</select>";
+            panelsHTML += "<button class='btn-descargar' id='btnDescarga-" + idx + "' onclick='descargarPDF(" + idx + ")'>Aplicar</button>";
+            panelsHTML += "</div>";
+
+            panelsHTML += "</div>";
+        });
+
+        tabsHTML += "</div>";
+        contenido.innerHTML = tabsHTML + panelsHTML;
+    }
+
+    function cambiarTab(idx) {
+        var btns = document.querySelectorAll(".tab-btn");
+        var panels = document.querySelectorAll(".tab-content");
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].className = "tab-btn";
+            panels[i].className = "tab-content";
+        }
+        btns[idx].className = "tab-btn activo";
+        document.getElementById("panel-" + idx).className = "tab-content activo";
+    }
+
+    function toggleBtnDescarga(idx) {
+        var sel = document.getElementById("selDescarga-" + idx);
+        var btn = document.getElementById("btnDescarga-" + idx);
+        btn.style.display = sel.value ? "inline-block" : "none";
+    }
+
+    function descargarPDF(idx) {
+        var vet = vetsGlobal[idx];
+        var usuario = vet[3]; // usuario del veterinario
+
+        fetch("controlEmpleados?accion=DescargarHorarioPDF&usr=" + encodeURIComponent(usuario))
+            .then(function(res) {
+                if (!res.ok) {
+                    return res.text().then(function(msg) { throw new Error(msg); });
+                }
+                return res.blob();
+            })
+            .then(function(blob) {
+                var hoy = new Date();
+                var fechaStr = hoy.getFullYear() + "-" +
+                    ("0" + (hoy.getMonth()+1)).slice(-2) + "-" +
+                    ("0" + hoy.getDate()).slice(-2);
+                var filename = "Horario_" + vet[1].replace(/ /g, "_") + "_" + fechaStr + ".pdf";
+
+                var url  = URL.createObjectURL(blob);
+                var link = document.createElement("a");
+                link.href     = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Abrir en nueva pestaña
+                window.open(url, "_blank");
+            })
+            .catch(function(err) {
+                alert("Error: " + err.message);
+            });
+    }
+</script>
+
+</body>
+</html>

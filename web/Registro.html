@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-file-pen"></i></div>
+    <h2 class="title">Registro de Usuario</h2>
+
+    <form action="controlUsuario" method="post">
+
+        <label class="label">Nombre:</label>
+        <input type="text" name="nombre" class="input" required>
+
+        <label class="label">Paterno:</label>
+        <input type="text" name="paterno" class="input" required>
+
+        <label class="label">Materno:</label>
+        <input type="text" name="materno" class="input" required>
+
+        <label class="label">Email:</label>
+        <input type="email" name="mail" class="input" required>
+
+        <label class="label">Teléfono:</label>
+        <input type="text" name="telefono" class="input">
+
+        <input type="submit" name="registrarUsuario" value="Registrar" class="btn btn-primary">
+
+    </form>
+
+</div>
+
+</body>
+</html>

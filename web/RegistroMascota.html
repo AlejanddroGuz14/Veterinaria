@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Mascota</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-paw"></i></div>
+    <h2 class="title">Registro de Mascota</h2>
+    <p class="subtitle">Ingresa los datos de la mascota</p>
+
+    <form action="controlMascotas" method="post">
+
+        <label class="label">Usuario del cliente:</label>
+        <input type="text" name="usuarioCliente" class="input" placeholder="Ej. CirGuzHer036" required>
+
+        <label class="label">Nombre de la mascota:</label>
+        <input type="text" name="nombreMascota" class="input" required>
+
+        <label class="label">Especie:</label>
+        <select name="idEspecie" class="select" required>
+            <option value="">-- Selecciona especie --</option>
+        </select>
+
+        <label class="label">Raza:</label>
+        <select name="idRaza" class="select" required>
+            <option value="">-- Selecciona raza --</option>
+        </select>
+
+        <label class="label">Sexo:</label>
+        <select name="idSexo" class="select" required>
+            <option value="">-- Selecciona sexo --</option>
+        </select>
+
+        <label class="label">Fecha de nacimiento:</label>
+        <input type="date" name="fechaNacimiento" class="input">
+
+        <label class="label">Peso (kg):</label>
+        <input type="text" name="peso" class="input" placeholder="Ej. 5.50">
+
+        <label class="label">Color:</label>
+        <input type="text" name="color" class="input">
+
+        <label class="label">Observaciones:</label>
+        <input type="text" name="observaciones" class="input">
+
+        <input type="hidden" name="opcion" value="AltaMascota">
+
+        <input type="submit" name="RegistrarMascotaA" value="Registrar" class="btn btn-primary">
+
+    </form>
+
+</div>
+
+<script>
+    // Carga especies y sexos al abrir la página
+    window.onload = function () {
+        cargarEspecies();
+        cargarSexos();
+    };
+
+    function cargarEspecies() {
+        fetch("controlMascotas?accion=CargarEspecies")
+            .then(r => r.json())
+            .then(data => {
+                const sel = document.querySelector("select[name='idEspecie']");
+                data.forEach(e => {
+                    const opt = document.createElement("option");
+                    opt.value = e[0];
+                    opt.text  = e[1];
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    function cargarSexos() {
+        fetch("controlMascotas?accion=CargarSexos")
+            .then(r => r.json())
+            .then(data => {
+                const sel = document.querySelector("select[name='idSexo']");
+                data.forEach(s => {
+                    const opt = document.createElement("option");
+                    opt.value = s[0];
+                    opt.text  = s[1];
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    // Al cambiar especie, recarga razas
+    document.querySelector("select[name='idEspecie']").addEventListener("change", function () {
+        const idEspecie = this.value;
+        const selRaza   = document.querySelector("select[name='idRaza']");
+        selRaza.innerHTML = "<option value=''>-- Selecciona raza --</option>";
+
+        if (idEspecie) {
+            fetch("controlMascotas?accion=CargarRazas&idEspecie=" + idEspecie)
+                .then(r => r.json())
+                .then(data => {
+                    data.forEach(r => {
+                        const opt = document.createElement("option");
+                        opt.value = r[0];
+                        opt.text  = r[1];
+                        selRaza.appendChild(opt);
+                    });
+                });
+        }
+    });
+</script>
+
+</body>
+</html>

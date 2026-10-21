@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Baja de Cita</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-xmark"></i></div>
+    <h1 class="title">Baja de Cita</h1>
+    <p class="subtitle">Ingresa el usuario del cliente para gestionar sus citas</p>
+
+    <form action="controlCitas" method="post">
+
+        <label class="label">Usuario del cliente:</label>
+        <input type="text" name="usuarioCliente" class="input" placeholder="Ej. JuaPerLop045" required>
+
+        <input type="submit" name="BuscarCitasA" value="Buscar" class="btn btn-primary">
+
+    </form>
+
+</div>
+
+</body>
+</html>

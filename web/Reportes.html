@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reporte-seccion { margin-bottom:25px; }
+        .reporte-seccion h3 { color:#023e8a; border-left:4px solid #00b4d8; padding-left:10px; margin-bottom:10px; }
+        .reporte-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:10px; }
+        .reporte-btn { display:block; background:#0077b6; color:white; padding:12px 15px; border-radius:10px; text-decoration:none; font-weight:bold; font-size:13px; text-align:center; transition:0.3s; cursor:pointer; border:none; width:100%; }
+        .reporte-btn:hover { background:#023e8a; }
+        .reporte-btn.excel { background:#2a9d8f; }
+        .reporte-btn.excel:hover { background:#1a7a6e; }
+        .reporte-btn.barras { background:#e76f51; }
+        .reporte-btn.barras:hover { background:#c45a3e; }
+        .reporte-btn.pie { background:#f4a261; color:#333; }
+        .reporte-btn.pie:hover { background:#e08b3a; }
+    </style>
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container-large">
+
+    <div class="icon"><i class="fa-solid fa-chart-bar"></i></div>
+    <h2 class="title">Reportes y Estadísticas</h2>
+    <p class="subtitle">Genera reportes en Excel y gráficas en PDF</p>
+
+    <!-- USUARIOS -->
+    <div class="reporte-seccion">
+        <h3><i class="fa-solid fa-user"></i> Usuarios</h3>
+        <div class="reporte-grid">
+            <button class="reporte-btn excel" onclick="descargar('UsuariosExcel')">📗 Excel — Usuarios activos</button>
+            <button class="reporte-btn pie" onclick="descargar('UsuariosPie')">🥧 Gráfica Pie — Usuarios por tipo</button>
+        </div>
+    </div>
+
+    <!-- MASCOTAS -->
+    <div class="reporte-seccion">
+        <h3><i class="fa-solid fa-paw"></i> Mascotas</h3>
+        <div class="reporte-grid">
+            <button class="reporte-btn excel" onclick="descargar('MascotasExcel')">📗 Excel — Mascotas activas</button>
+            <button class="reporte-btn barras" onclick="descargar('MascotasBarras')"><i class="fa-solid fa-chart-bar"></i> Barras — Mascotas por especie</button>
+            <button class="reporte-btn pie" onclick="descargar('MascotasBajaPie')">🥧 Pie — Bajas por motivo</button>
+        </div>
+    </div>
+
+    <!-- EMPLEADOS -->
+    <div class="reporte-seccion">
+        <h3><i class="fa-solid fa-briefcase"></i> Empleados</h3>
+        <div class="reporte-grid">
+            <button class="reporte-btn excel" onclick="descargar('EmpleadosExcel')">📗 Excel — Empleados activos</button>
+        </div>
+    </div>
+
+    <!-- CITAS -->
+    <div class="reporte-seccion">
+        <h3><i class="fa-solid fa-calendar-days"></i> Citas</h3>
+        <div class="reporte-grid">
+            <button class="reporte-btn excel" onclick="descargar('CitasExcel')">📗 Excel — Todas las citas</button>
+            <button class="reporte-btn pie" onclick="descargar('CitasEstadoPie')">🥧 Pie — Citas por estado</button>
+            <button class="reporte-btn barras" onclick="descargar('CitasVetBarras')"><i class="fa-solid fa-chart-bar"></i> Barras — Citas por veterinario</button>
+            <button class="reporte-btn barras" onclick="descargar('CitasMesBarras')"><i class="fa-solid fa-chart-bar"></i> Barras — Citas por mes</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function descargar(reporte) {
+        fetch("controlReportes?reporte=" + reporte)
+            .then(function(res) {
+                if (!res.ok) throw new Error("Error al generar reporte");
+                var disposition = res.headers.get("Content-Disposition") || "";
+                var filename = "reporte";
+                var match = disposition.match(/filename="?([^"]+)"?/);
+                if (match) filename = match[1];
+                return res.blob().then(function(blob) { return {blob:blob, filename:filename}; });
+            })
+            .then(function(data) {
+                var url = URL.createObjectURL(data.blob);
+                var link = document.createElement("a");
+                link.href = url;
+                link.download = data.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.open(url, "_blank");
+            })
+            .catch(function(err) { alert(err.message); });
+    }
+</script>
+
+</body>
+</html>

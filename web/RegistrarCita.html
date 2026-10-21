@@ -1,0 +1,368 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Cita</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .horario-dia {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .horario-dia .dia-titulo {
+            background: #023e8a;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 10px 10px 0 0;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+            width: 250px;
+        }
+        .horario-dia .horas-lista {
+            border: 2px solid #90e0ef;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            width: 250px;
+            overflow: hidden;
+        }
+        .hora-bloque {
+            padding: 8px 10px;
+            font-size: 13px;
+            text-align: center;
+            border-bottom: 1px solid #e0f7fa;
+            background: #f0f9ff;
+            color: #023e8a;
+            cursor: default;
+        }
+        .hora-bloque.disponible {
+            background: #00b4d8;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .hora-bloque.disponible:hover { background: #023e8a; }
+        .hora-bloque.ocupada {
+            background: #e63946;
+            color: white;
+            font-weight: bold;
+            cursor: not-allowed;
+        }
+        .hora-bloque.seleccionada {
+            background: #023e8a;
+            color: white;
+            font-weight: bold;
+        }
+        .hora-bloque.fuera {
+            background: #f0f9ff;
+            color: #aaa;
+        }
+        .leyenda {
+            display: flex;
+            gap: 15px;
+            margin-top: 12px;
+            font-size: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+        .leyenda-item { display: flex; align-items: center; gap: 5px; }
+        .leyenda-color { width: 16px; height: 16px; border-radius: 4px; }
+    </style>
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-calendar-days"></i></div>
+    <h2 class="title">Registrar Cita</h2>
+    <p class="subtitle">Completa los datos para agendar una cita</p>
+
+    <form action="controlCitas" method="post" id="formCita">
+
+        <!-- USUARIO DEL CLIENTE -->
+        <label class="label">Usuario del cliente:</label>
+        <input type="text" name="usuarioCliente" id="usuarioCliente"
+               class="input" placeholder="Ej. JuaPerLop045" required
+               onblur="cargarMascotas()">
+
+        <!-- MASCOTA -->
+        <label class="label">Mascota:</label>
+        <select name="idMascota" id="selMascota" class="select" required>
+            <option value="">-- Primero ingresa el usuario del cliente --</option>
+        </select>
+
+        <!-- VETERINARIO -->
+        <label class="label">Veterinario:</label>
+        <select name="idAcceso" id="selVeterinario" class="select" required
+                onchange="onVeterinarioChange()">
+            <option value="">-- Selecciona un veterinario --</option>
+        </select>
+
+        <!-- FECHA DE LA CITA -->
+        <div id="seccionFecha" style="display:none;">
+            <label class="label">Fecha de la cita:</label>
+            <input type="date" name="fechaCita" id="inputFecha" class="input" required
+                   onchange="onFechaChange()">
+        </div>
+
+        <!-- MOTIVO -->
+        <label class="label">Motivo de consulta:</label>
+        <input type="text" name="motivo" class="input"
+               placeholder="Ej. Revisión general, vacuna, etc." required>
+
+        <!-- OBSERVACIONES -->
+        <label class="label">Observaciones:</label>
+        <input type="text" name="observaciones" class="input"
+               placeholder="Notas adicionales (opcional)">
+
+        <!-- HORARIO DEL DÍA SELECCIONADO -->
+        <div id="seccionHorario" style="display:none;">
+            <hr style="border-color:#90e0ef; margin:20px 0;">
+            <h3 class="title" style="font-size:18px;"><i class="fa-solid fa-clock"></i> Horario Disponible</h3>
+            <p class="subtitle">Haz clic en una hora disponible para seleccionarla</p>
+
+            <div id="horarioDia" class="horario-dia"></div>
+
+            <div class="leyenda">
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background:#00b4d8;"></div>
+                    <span>Disponible</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background:#e63946;"></div>
+                    <span>Ocupada</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background:#023e8a;"></div>
+                    <span>Seleccionada</span>
+                </div>
+            </div>
+
+            <div id="horaSeleccionada" style="margin-top:10px; font-size:14px; color:#023e8a; font-weight:bold; text-align:center;">
+                Hora seleccionada: ninguna
+            </div>
+        </div>
+
+        <!-- CAMPOS OCULTOS -->
+        <input type="hidden" name="idHorario" id="idHorario" value="">
+
+        <br>
+        <button type="submit" name="RegistrarCitaA" value="1" class="btn btn-primary" onclick="return validarFormulario()"><i class="fa-solid fa-clipboard-list"></i> Registrar Cita</button>
+
+    </form>
+
+</div>
+
+<script>
+    const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    let horarioVeterinario = []; // datos del horario semanal
+    let horasOcupadas = [];      // horas ya tomadas
+
+    window.onload = function () {
+        cargarVeterinarios();
+        // Establecer fecha mínima = hoy
+        const hoy = new Date().toISOString().split("T")[0];
+        document.getElementById("inputFecha").setAttribute("min", hoy);
+    };
+
+    // ── Carga veterinarios ──
+    function cargarVeterinarios() {
+        fetch("controlCitas?accion=CargarVeterinarios")
+            .then(r => r.json())
+            .then(data => {
+                const sel = document.getElementById("selVeterinario");
+                data.forEach(v => {
+                    const opt = document.createElement("option");
+                    opt.value = v[0];
+                    opt.text  = v[1] + " — " + v[2];
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    // ── Carga mascotas del cliente ──
+    function cargarMascotas() {
+        const usr = document.getElementById("usuarioCliente").value.trim();
+        if (!usr) return;
+        fetch("controlCitas?accion=CargarMascotasPorCliente&usr=" + encodeURIComponent(usr))
+            .then(r => r.json())
+            .then(data => {
+                const sel = document.getElementById("selMascota");
+                sel.innerHTML = "";
+                if (!data || data.length === 0) {
+                    sel.innerHTML = "<option value=''>-- El cliente no tiene mascotas --</option>";
+                    return;
+                }
+                const def = document.createElement("option");
+                def.value = ""; def.text = "-- Selecciona una mascota --";
+                sel.appendChild(def);
+                data.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m[0];
+                    opt.text  = m[1] + " (" + m[2] + ")";
+                    sel.appendChild(opt);
+                });
+            });
+    }
+
+    // ── Al seleccionar veterinario: cargar su horario y mostrar campo fecha ──
+    function onVeterinarioChange() {
+        const idAcceso = document.getElementById("selVeterinario").value;
+        document.getElementById("seccionHorario").style.display = "none";
+        document.getElementById("inputFecha").value = "";
+        limpiarSeleccion();
+
+        if (!idAcceso) {
+            document.getElementById("seccionFecha").style.display = "none";
+            return;
+        }
+
+        fetch("controlCitas?accion=CargarHorarioVeterinario&idAcceso=" + idAcceso)
+            .then(r => r.json())
+            .then(data => {
+                horarioVeterinario = data;
+                if (!data || data.length === 0) {
+                    document.getElementById("seccionFecha").style.display = "none";
+                    alert("Este veterinario no tiene horario semanal asignado.");
+                    return;
+                }
+                document.getElementById("seccionFecha").style.display = "block";
+            });
+    }
+
+    // ── Al seleccionar fecha: verificar que el veterinario trabaja ese día y cargar horas ──
+    function onFechaChange() {
+        const fechaStr = document.getElementById("inputFecha").value;
+        if (!fechaStr) return;
+
+        // Obtener día de la semana (1=Lunes...7=Domingo)
+        const fecha = new Date(fechaStr + "T12:00:00");
+        const jsDay = fecha.getDay(); // 0=Dom, 1=Lun...6=Sab
+        const diaSemana = jsDay === 0 ? 7 : jsDay;
+
+        // Buscar si el veterinario trabaja ese día
+        const diaHorario = horarioVeterinario.find(h => parseInt(h[0]) === diaSemana);
+
+        if (!diaHorario) {
+            document.getElementById("seccionHorario").style.display = "none";
+            alert("El veterinario no trabaja el " + DIAS[diaSemana - 1] + ". Selecciona otra fecha.");
+            return;
+        }
+
+        // Cargar horas ocupadas del veterinario en esa fecha
+        const idAcceso = document.getElementById("selVeterinario").value;
+        fetch("controlCitas?accion=HorasOcupadas&idAcceso=" + idAcceso)
+            .then(r => r.json())
+            .then(data => {
+                horasOcupadas = data || [];
+                construirHorarioDia(diaHorario, diaSemana, fechaStr);
+                document.getElementById("seccionHorario").style.display = "block";
+                limpiarSeleccion();
+            });
+    }
+
+    // ── Construye la columna de horas del día seleccionado ──
+    function construirHorarioDia(diaHorario, diaSemana, fechaStr) {
+        const H_INICIO = 6;
+        const H_FIN    = 22;
+        const hEntrada = parseInt(diaHorario[2].substring(0, 2));
+        const hSalida  = parseInt(diaHorario[3].substring(0, 2));
+
+        // Set de horas ocupadas para esta fecha
+        const ocupadasSet = new Set();
+        horasOcupadas.forEach(o => {
+            // o = [fecha, hora, idHorario]
+            if (o[0] === fechaStr) {
+                const h = parseInt(o[1].substring(0, 2));
+                ocupadasSet.add(h);
+            }
+        });
+
+        const container = document.getElementById("horarioDia");
+        container.innerHTML = "";
+
+        const titulo = document.createElement("div");
+        titulo.className = "dia-titulo";
+        titulo.textContent = DIAS[diaSemana - 1] + " — " + fechaStr;
+        container.appendChild(titulo);
+
+        const lista = document.createElement("div");
+        lista.className = "horas-lista";
+
+        for (let h = H_INICIO; h < H_FIN; h++) {
+            const trabajando = (h >= hEntrada && h < hSalida);
+            const ocupada    = ocupadasSet.has(h);
+            const ampm = h >= 12 ? "PM" : "AM";
+            const h12  = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+            const etiq = h12 + ":00 " + ampm;
+            const horaStr = (h < 10 ? "0" : "") + h + ":00:00";
+
+            const bloque = document.createElement("div");
+            bloque.className = "hora-bloque";
+            bloque.textContent = etiq;
+            bloque.dataset.hora = horaStr;
+            bloque.dataset.fecha = fechaStr;
+            bloque.dataset.etiq = DIAS[diaSemana - 1] + " " + fechaStr + " " + etiq;
+
+            if (!trabajando) {
+                bloque.classList.add("fuera");
+            } else if (ocupada) {
+                bloque.classList.add("ocupada");
+                bloque.textContent = etiq + " ⛔";
+            } else {
+                bloque.classList.add("disponible");
+                bloque.onclick = () => seleccionarHora(bloque);
+            }
+
+            lista.appendChild(bloque);
+        }
+
+        container.appendChild(lista);
+    }
+
+    // ── Selecciona una hora ──
+    function seleccionarHora(bloque) {
+        document.querySelectorAll(".hora-bloque.seleccionada").forEach(b => {
+            b.classList.remove("seleccionada");
+            b.classList.add("disponible");
+        });
+        bloque.classList.remove("disponible");
+        bloque.classList.add("seleccionada");
+
+        document.getElementById("horaSeleccionada").textContent =
+            "Hora seleccionada: " + bloque.dataset.etiq;
+
+        // Obtener idHorario
+        fetch("controlCitas?accion=ObtenerIdHorario" +
+              "&fecha=" + bloque.dataset.fecha +
+              "&hora=" + encodeURIComponent(bloque.dataset.hora))
+            .then(r => r.json())
+            .then(data => {
+                if (data && data[0] && data[0][0]) {
+                    document.getElementById("idHorario").value = data[0][0];
+                } else {
+                    document.getElementById("idHorario").value = "";
+                }
+            });
+    }
+
+    function limpiarSeleccion() {
+        document.getElementById("idHorario").value = "";
+        document.getElementById("horaSeleccionada").textContent = "Hora seleccionada: ninguna";
+    }
+
+    function validarFormulario() {
+        if (!document.getElementById("idHorario").value) {
+            alert("Debes seleccionar una hora disponible.");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+</body>
+</html>

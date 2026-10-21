@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <h2 class="title">Inicio de Sesión</h2>
+
+    <form action="controlUsuario" method="post">
+
+        <label class="label">Usuario:</label>
+        <input type="text" name="usuario" class="input" required>
+
+        <label class="label">Password:</label>
+        <input type="password" name="pass" class="input" required>
+
+        <input type="submit" name="validarUsuario" value="Entrar" class="btn btn-primary">
+<div class="register-box">
+    <center><p>¿No estás registrado?</p>
+        <a href="Registro.html">Registrarse</a></center>
+</div>
+    </form>
+
+    <form action="controlUsuario" method="post" style="margin-top:10px;">
+        <input type="hidden" name="invitado" value="1">
+        <input type="submit" name="continuarInvitado" value="Continuar como invitado" class="btn btn-primary" style="background:#90e0ef; color:#023e8a;">
+    </form>
+
+</div>
+
+</body>
+</html>

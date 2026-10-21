@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Datos Laborales</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-user"></i></div>
+    <h1 class="title">Consultar Datos Laborales</h1>
+    <p class="subtitle">Ingresa el usuario del empleado a consultar</p>
+
+    <form action="controlEmpleados" method="post">
+
+        <label class="label">Usuario del empleado:</label>
+        <select name="usuarioEmpleado" class="select" required>
+            <option value="">-- Selecciona un empleado --</option>
+        </select>
+
+        <input type="submit" name="ConsultaEmpleadoA" value="Consultar" class="btn btn-primary">
+
+    </form>
+
+</div>
+
+<script>
+    window.onload = function() {
+        fetch("controlEmpleados?accion=CargarEmpleadosYAdmins")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var sel = document.querySelector("select[name='usuarioEmpleado']");
+                data.forEach(function(e) {
+                    var opt = document.createElement("option");
+                    opt.value = e[0];
+                    var tipo = e[2] === "A" ? "Admin" : "Empleado";
+                    opt.text  = e[1] + " (" + tipo + ") — " + e[0];
+                    sel.appendChild(opt);
+                });
+            });
+    };
+</script>
+
+</body>
+</html>

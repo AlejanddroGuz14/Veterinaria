@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Imprimir Horario Laboral</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-print"></i></div>
+    <h2 class="title">Imprimir Horario Laboral</h2>
+    <p class="subtitle">Ingresa el usuario del empleado para descargar su horario en PDF</p>
+
+    <form action="controlEmpleados" method="post" id="formPDF">
+
+        <label class="label">Usuario del empleado:</label>
+        <select name="usuarioEmpleado" id="usuarioEmpleado" class="select" required>
+            <option value="">-- Selecciona un empleado --</option>
+        </select>
+
+        <button type="submit" name="ImprimirHorarioA" value="1" class="btn btn-primary"><i class="fa-solid fa-file-lines"></i> Generar PDF</button>
+
+    </form>
+
+    <!-- Mensaje de confirmación (aparece tras la descarga) -->
+    <div id="msgDescarga" style="display:none; margin-top:20px; text-align:center;">
+        <p style="color:#0077b6; font-weight:bold; font-size:16px;">
+            ✅ Horario descargado correctamente
+        </p>
+    </div>
+
+</div>
+
+<script>
+    window.onload = function() {
+        fetch("controlEmpleados?accion=CargarEmpleadosYAdmins")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var sel = document.getElementById("usuarioEmpleado");
+                data.forEach(function(e) {
+                    var opt = document.createElement("option");
+                    opt.value = e[0];
+                    var tipo = e[2] === "A" ? "Admin" : "Empleado";
+                    opt.text  = e[1] + " (" + tipo + ") — " + e[0];
+                    sel.appendChild(opt);
+                });
+            });
+    };
+
+    document.getElementById('formPDF').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const usuario = document.getElementById('usuarioEmpleado').value.trim();
+        if (!usuario) return;
+
+        // Hace la petición POST y recibe el PDF como blob para descargarlo
+        fetch('controlEmpleados', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'ImprimirHorarioA=1&usuarioEmpleado=' + encodeURIComponent(usuario)
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.text().then(msg => { throw new Error(msg); });
+            }
+            // Obtener el nombre del archivo del header Content-Disposition
+            const disposition = res.headers.get('Content-Disposition') || '';
+            let filename = 'Horario_' + usuario + '.pdf';
+            const match = disposition.match(/filename="?([^"]+)"?/);
+            if (match) filename = match[1];
+
+            return res.blob().then(blob => ({ blob, filename }));
+        })
+        .then(({ blob, filename }) => {
+            // Crear enlace temporal y forzar descarga
+            const url  = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href     = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            // Mostrar mensaje de confirmación
+            document.getElementById('msgDescarga').style.display = 'block';
+        })
+        .catch(err => {
+            alert('Error: ' + err.message);
+        });
+    });
+</script>
+
+</body>
+</html>

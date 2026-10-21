@@ -1,0 +1,840 @@
+/* =====================================================
+   RESET GENERAL
+   Elimina márgenes y padding por defecto en todos
+   los elementos, asegura box-sizing consistente
+===================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* =====================================================
+   BODY — FONDO Y CENTRADO
+   .body-bg    → fondo con imagen y gradiente azul
+   .body-center → centra el contenido vertical y horizontal
+===================================================== */
+.body-bg {
+    background: linear-gradient(rgba(0,150,199,0.5), rgba(46,196,182,0.5)),
+                url('https://images.unsplash.com/photo-1517849845537-4d257902454a');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+}
+
+.body-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =====================================================
+   CONTENEDORES
+   .container       → caja blanca estándar (formularios)
+   .container-small → variante más compacta
+   .container-large → variante más ancha (menús de rol)
+   .main-panel      → panel grande semi-transparente (admin)
+===================================================== */
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.container-small {
+    max-width: 400px;
+}
+
+.container-large {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    margin: 30px auto;
+}
+
+.main-panel {
+    background: rgba(255,255,255,0.9);
+    margin: 30px;
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* =====================================================
+   TIPOGRAFÍA
+   .title    → título principal de cada página (azul, centrado)
+   .subtitle → descripción secundaria debajo del título
+===================================================== */
+.title {
+    text-align: center;
+    color: #0077b6;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* =====================================================
+   TEXTO UTILITARIO
+   .text-center → centra texto
+   .text-muted  → texto gris secundario
+===================================================== */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #555;
+}
+
+/* =====================================================
+   ICONO DECORATIVO
+   .icon → emoji o símbolo grande centrado arriba del form
+===================================================== */
+.icon {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+/* =====================================================
+   ETIQUETAS DE FORMULARIO
+   .label → texto en negrita encima de cada input
+===================================================== */
+.label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #023e8a;
+}
+
+/* =====================================================
+   INPUTS DE FORMULARIO
+   .input        → campo de texto estándar
+   .input-shadow → variante con sombra al enfocar
+   .input-glow   → variante con brillo al enfocar
+===================================================== */
+.input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    border-color: #0096c7;
+}
+
+.input-shadow:focus {
+    border-color: #0096c7;
+    box-shadow: 0 0 8px rgba(0,150,199,0.3);
+}
+
+.input-glow:focus {
+    border-color: #0096c7;
+    box-shadow: 0 0 8px rgba(0,150,199,0.3);
+}
+
+/* =====================================================
+   SELECT (COMBOBOX)
+   .select → desplegable estilizado para formularios
+===================================================== */
+.select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #90e0ef;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    background: white;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.select:focus {
+    border-color: #0096c7;
+    box-shadow: 0 0 8px rgba(0,150,199,0.3);
+}
+
+/* =====================================================
+   BOTONES GENERALES
+   .btn          → base de todos los botones
+   .btn-primary  → azul principal (confirmar, registrar)
+   .btn-danger   → rojo (eliminar, dar de baja)
+   .btn-search   → amarillo (buscar)
+   .btn-warning  → amarillo alternativo
+   .btn-hero     → botón grande para sección hero
+===================================================== */
+.btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-primary {
+    background: #0077b6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #023e8a;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #495057;
+}
+
+.btn-danger {
+    background: #e63946;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #9d0208;
+}
+
+.btn-search {
+    background: #ffb703;
+    color: #333;
+}
+
+.btn-search:hover {
+    background: #fb8500;
+    color: white;
+}
+
+.btn-warning {
+    background: #ffb703;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background: #fb8500;
+    color: white;
+}
+
+.btn-hero {
+    display: inline-block;
+    background: #ffb703;
+    color: #333;
+    padding: 12px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-hero:hover {
+    background: #fb8500;
+    color: white;
+}
+
+/* =====================================================
+   BOTONES DEL PANEL ADMIN
+   .admin-btn → botón/link de acción dentro de admin-card
+===================================================== */
+.admin-btn {
+    display: block;
+    background: #00b4d8;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    margin: 10px 0;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: left;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+}
+
+.admin-btn:hover {
+    background: #0077b6;
+    color: white;
+}
+
+/* =====================================================
+   ENLACE DE REGRESO
+   .back → contenedor del link "volver"
+   .link → estilo del enlace de navegación
+===================================================== */
+.back {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.link {
+    color: #0077b6;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.link:hover {
+    color: #023e8a;
+    text-decoration: underline;
+}
+
+/* =====================================================
+   CAJA DE REGISTRO (LOGIN)
+   .register-box → recuadro azul claro con borde punteado
+   .arrows       → flechas decorativas del login
+===================================================== */
+.register-box {
+    margin-top: 25px;
+    background: #e0f7fa;
+    padding: 18px;
+    border-radius: 15px;
+    border: 2px dashed #00b4d8;
+}
+
+.register-box p {
+    color: #023e8a;
+    font-size: 15px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    line-height: 1.6;
+}
+
+.register-box a {
+    display: inline-block;
+    text-decoration: none;
+    background: #0096c7;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.register-box a:hover {
+    background: #023e8a;
+}
+
+.arrows {
+    font-size: 24px;
+    color: #ff8800;
+    margin-bottom: 8px;
+}
+
+/* =====================================================
+   TABLAS (JSP DINÁMICAS)
+   .table    → tabla de datos con encabezado azul
+   .table th → encabezado azul con texto blanco
+   .table td → celda con borde inferior gris
+===================================================== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table th {
+    background: #0077b6;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.table td {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+
+.table tr:hover td {
+    background: #e0f7fa;
+}
+
+/* =====================================================
+   PANEL ADMINISTRADOR
+   .admin-container → centra y limita el ancho del panel
+   .admin-header    → encabezado con título y descripción
+   .admin-line      → línea divisoria azul claro
+   .admin-grid      → grid responsivo de tarjetas
+   .admin-card      → tarjeta individual de sección
+===================================================== */
+.admin-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px;
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin-header h1 {
+    color: #0077b6;
+    font-size: 40px;
+}
+
+.admin-header p {
+    color: #555;
+    margin-top: 5px;
+}
+
+.admin-line {
+    border: 1px solid #90e0ef;
+    margin: 20px 0;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.admin-card {
+    background: rgba(255,255,255,0.9);
+    border: 2px solid #caf0f8;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.admin-card h2 {
+    color: #023e8a;
+    margin-bottom: 20px;
+    border-left: 6px solid #00b4d8;
+    padding-left: 10px;
+}
+
+/* =====================================================
+   MENÚ DE ROL GENÉRICO (Invitado, Cliente, Empleado)
+   .header  → encabezado del menú de rol
+   .grid    → grid de tarjetas de opciones
+   .card    → tarjeta individual de opción
+===================================================== */
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: #f0f9ff;
+    border: 2px solid #caf0f8;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.card h2 {
+    color: #023e8a;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* =====================================================
+   DROPDOWN MENU
+   .dropdown      → contenedor relativo del botón
+   .dropdown-menu → menú desplegable flotante
+===================================================== */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    min-width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 10px 0;
+    z-index: 100;
+    margin-top: 10px;
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #023e8a;
+    font-weight: bold;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+    background: #caf0f8;
+}
+
+/* =====================================================
+   SUBMENÚ LATERAL (alternativa al dropdown)
+   .submenu         → contenedor relativo
+   .submenu-content → panel que aparece a la derecha
+===================================================== */
+.submenu {
+    position: relative;
+}
+
+.submenu-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 110%;
+    min-width: 220px;
+    background: white;
+    border: 2px solid #caf0f8;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    z-index: 10000;
+}
+
+.submenu-content.active {
+    display: block;
+}
+
+.submenu-content a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    background: white;
+    color: #023e8a;
+    font-weight: bold;
+}
+
+.submenu-content a:hover {
+    background: #00b4d8;
+    color: white;
+}
+
+/* =====================================================
+   NAVBAR
+   .nav   → barra de navegación azul oscuro
+   .nav a → links de la barra
+===================================================== */
+.nav {
+    background: #023e8a;
+    padding: 15px;
+    text-align: center;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px;
+    font-weight: bold;
+}
+
+.nav a:hover {
+    color: #90e0ef;
+}
+
+/* =====================================================
+   HERO (PÁGINA DE INICIO PÚBLICA)
+   .hero         → sección de bienvenida con imagen
+   .hero-overlay → capa oscura sobre la imagen
+===================================================== */
+.hero {
+    background-size: cover;
+    background-position: center;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.hero-overlay {
+    background-color: rgba(0,0,0,0.5);
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.hero h2 {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+/* =====================================================
+   SERVICIOS / CARDS PÚBLICAS
+   .services     → contenedor flex de tarjetas
+   .service-card → tarjeta individual de servicio
+===================================================== */
+.services {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.service-card {
+    background: white;
+    width: 280px;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+}
+
+.service-card h3 {
+    color: #0096c7;
+    margin-bottom: 15px;
+}
+
+/* =====================================================
+   GALERÍA
+   .gallery     → contenedor flex de imágenes
+   .gallery img → imagen con bordes redondeados
+===================================================== */
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.gallery img {
+    width: 300px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* =====================================================
+   CONTACTO
+   .contact-box → caja de información de contacto
+===================================================== */
+.contact-box {
+    background: #caf0f8;
+    border-radius: 20px;
+    max-width: 800px;
+    margin: auto;
+    padding: 40px;
+}
+
+.contact-box p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+/* =====================================================
+   FOOTER
+   .footer → pie de página azul oscuro
+===================================================== */
+.footer {
+    background: #023e8a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+/* =====================================================
+   ESPACIADO UTILITARIO
+   .mt-10 / .mt-15 / .mt-20 → margin-top rápido
+   .mb-10 / .mb-15 / .mb-20 → margin-bottom rápido
+===================================================== */
+.mt-10 { margin-top: 10px; }
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+
+/* =====================================================
+   CALENDARIO Y RELOJ (módulo Horario Laboral)
+   .calendar-wrapper  → contenedor del calendario inline
+   .time-picker       → contenedor del reloj 24h
+===================================================== */
+.calendar-wrapper {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.calendar-wrapper input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #90e0ef;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    background: white;
+    color: #023e8a;
+}
+
+.calendar-wrapper input[type="date"]:focus {
+    border-color: #0096c7;
+    box-shadow: 0 0 8px rgba(0,150,199,0.3);
+}
+
+.time-picker {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.time-picker input[type="time"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #90e0ef;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    background: white;
+    color: #023e8a;
+}
+
+.time-picker input[type="time"]:focus {
+    border-color: #0096c7;
+    box-shadow: 0 0 8px rgba(0,150,199,0.3);
+}
+
+.time-row {
+    display: flex;
+    gap: 15px;
+}
+
+/* =====================================================
+   RESPONSIVE
+   Ajustes para pantallas menores a 768px
+===================================================== */
+@media (max-width: 768px) {
+
+    .hero h2 {
+        font-size: 30px;
+    }
+
+    .hero p {
+        font-size: 18px;
+    }
+
+    .nav a {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container-large {
+        max-width: 100%;
+        margin: 15px;
+    }
+
+    .main-panel {
+        margin: 15px;
+        padding: 20px;
+    }
+}
+
+/* =====================================================
+   RESPUESTAS DEL SERVIDOR
+   Estilos para las páginas de respuesta que generan
+   los servlets (registro, baja, modificar, etc.)
+   Se aplican automáticamente a h2, h3, p dentro del body
+===================================================== */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Respuesta exitosa */
+h2, h3 {
+    text-align: center;
+    padding: 15px;
+}
+
+/* Contenedor automático para respuestas sin layout */
+body > h2:first-child,
+body > h3:first-child,
+body > p:first-child {
+    max-width: 500px;
+    margin: 80px auto 20px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+body > h2 ~ h3,
+body > h2 ~ p,
+body > h3 ~ p,
+body > h3 ~ h3 {
+    max-width: 500px;
+    margin: 10px auto;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    text-align: center;
+    color: #023e8a;
+}
+
+/* Respuesta con tabla */
+body > table:first-child {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+}

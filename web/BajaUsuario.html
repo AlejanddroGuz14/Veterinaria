@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Baja de Usuario</title>
+    <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+    function confirmar(){
+        return confirm("¿Seguro que deseas dar de baja este usuario?");
+    }
+    </script>
+</head>
+
+<body class="body-bg body-center">
+
+<div class="container">
+
+    <div class="icon"><i class="fa-solid fa-trash"></i></div>
+    <h1 class="title">Baja de Usuario</h1>
+    <p class="subtitle">Ingresa el usuario que deseas desactivar</p>
+
+    <form action="controlUsuarios" method="post" onsubmit="return confirmar();">
+
+        <label class="label">Usuario:</label>
+        <input type="text" name="usuario" class="input" required>
+        <input type="hidden" name="opcion" value="BajaUsuario">
+
+        <input type="submit" name="BajaUsuarioA" value="Dar de baja" class="btn btn-danger">
+
+    </form>
+
+</div>
+
+</body>
+</html>
